@@ -1,9 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
-import { VisualizationCharts } from './components/VisualizationCharts';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
-import { Train, Activity, AlertTriangle, TrendingUp, Settings, Award, FileText } from 'lucide-react';
-import { InputDataPanel } from './components/InputDataPanel';
+import { useState, useEffect } from 'react';
+import { VisualizationCharts } from '../components/VisualizationCharts';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Activity, AlertTriangle, TrendingUp, Settings, Award, FileText } from 'lucide-react';
+import { InputDataPanel } from '../components/InputDataPanel';
 import {
   Menubar,
   MenubarMenu,
@@ -11,36 +11,35 @@ import {
   MenubarContent,
   MenubarItem,
   MenubarSeparator,
-} from './components/ui/menubar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card';
-import { Button } from './components/ui/button';
-import { Badge } from './components/ui/badge';
-import { Separator } from './components/ui/separator';
-import { ThemeToggle } from './components/ThemeToggle';
-import { ControllerMessage } from './components/ControllerMessage';
-import { PredictionDashboard } from './components/PredictionDashboard';
-import { Toaster } from './components/ui/toaster';
+} from '../components/ui/menubar';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { ThemeToggle } from '../components/ThemeToggle';
+import { ControllerMessage } from '../components/ControllerMessage';
+import { PredictionDashboard } from '../components/PredictionDashboard';
+import { Toaster } from '../components/ui/toaster';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendsSection } from './components/TrendsSection';
-import { AchievementsSection } from './components/AchievementsSection';
-import { ControllerRecordsSection } from './components/ControllerRecordsSection';
-import Login from './pages/Login';
+import { TrendsSection } from '../components/TrendsSection';
+import { AchievementsSection } from '../components/AchievementsSection';
+import { ControllerRecordsSection } from '../components/ControllerRecordsSection';
+import Login from './Login';
+import LandingPage from './LandingPage';
 
 // Mock data for demonstration
 const mockPredictionData = {
   delay: {
     minutes: 14,
     confidence: 95.2,
-    status: 'warning' // green, warning, danger
+    status: 'warning' as const // green, warning, danger
   },
   conflict: {
     probability: 25,
-    risk: 'medium', // low, medium, high
+    risk: 'medium' as const, // low, medium, high
     confidence: 88.9
   },
   throughput: {
+    target: 92,
     current: 85,
-    potential: 92,
     trend: '+7.2%'
   }
 };
@@ -56,6 +55,11 @@ const mockControllerMessage = {
   timestamp: new Date()
 };
 
+const mockTrendsMessage = {
+  title: 'Trends Analysis',
+  description: 'Current performance trends show improving efficiency. Overall system throughput has increased by 12% this month with reduced average delays.'
+};
+
 // Placeholder components for new sections
 const SystemStatus = () => (
   <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200 dark:border-slate-700">
@@ -69,18 +73,6 @@ const SystemStatus = () => (
   </Card>
 );
 
-const Achievements = () => (
-  <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200 dark:border-slate-700">
-    <CardHeader>
-      <CardTitle className="text-xl font-semibold text-slate-800 dark:text-slate-100">Achievements</CardTitle>
-      <CardDescription className="text-slate-600 dark:text-slate-400">Record of system and operator achievements</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <p>List of achievements and milestones would be displayed here.</p>
-    </CardContent>
-  </Card>
-);
-
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -89,7 +81,7 @@ export default function App() {
     return false;
   });
   const [predictions, setPredictions] = useState(mockPredictionData);
-  const [controllerMessage, setControllerMessage] = useState(mockControllerMessage);
+  const [controllerMessage] = useState(mockControllerMessage);
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState('input');
@@ -113,7 +105,7 @@ export default function App() {
         throughput: {
           ...prev.throughput,
           current: Math.max(60, Math.min(100, prev.throughput.current + (Math.random() - 0.5) * 3)),
-          potential: Math.max(70, Math.min(100, prev.throughput.potential + (Math.random() - 0.5) * 2))
+          target: Math.max(70, Math.min(100, prev.throughput.target + (Math.random() - 0.5) * 2))
         }
       }));
       setLastUpdated(new Date());
@@ -125,9 +117,7 @@ export default function App() {
   useEffect(() => {
     const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
     setIsLoggedIn(loggedIn);
-    if (!loggedIn) {
-      window.location.hash = '#/login';
-    } else if (window.location.hash === '#/login' || window.location.hash === '') {
+    if (loggedIn && (window.location.hash === '#/login' || window.location.hash === '')) {
       window.location.hash = '#/';
     }
 
@@ -182,9 +172,13 @@ export default function App() {
 
   if (!isLoggedIn) {
     if (currentPath === '#/login') {
-      return <Login />;
+      return <Login onLoginSuccess={() => {
+        setIsLoggedIn(true);
+        window.location.hash = '#/';
+      }} />;
     }
-    return null; // or a loading spinner while redirecting
+    // Show landing page when not logged in and not on login page
+    return <LandingPage />;
   }
 
   if (currentPath === '#/login') {
@@ -338,7 +332,7 @@ export default function App() {
                 </TabsContent>
 
                 <TabsContent value="trends" className="mt-8">
-                  <TrendsSection />
+                  <TrendsSection message={mockTrendsMessage} />
                 </TabsContent>
 
                 <TabsContent value="achievements" className="mt-8">
@@ -363,7 +357,7 @@ export default function App() {
           
           {/* New Sections */}
           <section id="trends" className="space-y-4">
-            <TrendsSection />
+            <TrendsSection message={mockTrendsMessage} />
           </section>
 
           <section id="achievements" className="space-y-4">

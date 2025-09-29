@@ -54,16 +54,6 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
     'Suburban'
   ];
 
-  const sections = [
-    'A1 - Central Junction',
-    'A2 - North Terminal',
-    'A3 - East Branch',
-    'B1 - South Junction',
-    'B2 - West Terminal',
-    'C1 - Freight Yard',
-    'C2 - Maintenance'
-  ];
-
   const signalStatuses = [
     { value: 'green', label: 'Green - Clear', color: 'bg-green-500' },
     { value: 'yellow', label: 'Yellow - Caution', color: 'bg-yellow-500' },
@@ -190,21 +180,26 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
             {/* Section ID */}
             <div className="space-y-2">
               <Label htmlFor="sectionId">Section ID</Label>
-              <Select 
-                value={formData.sectionId} 
-                onValueChange={(value) => setFormData({...formData, sectionId: value})}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select section" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sections.map((section) => (
-                    <SelectItem key={section} value={section.split(' - ')[0].toLowerCase()}>
-                      {section}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center space-x-2">
+                <span className="px-3 py-2 bg-slate-100 dark:bg-slate-700 border border-r-0 rounded-l-md text-sm font-mono">
+                  SC_
+                </span>
+                <Input
+                  id="sectionId"
+                  type="number"
+                  min="1"
+                  placeholder="Enter number"
+                  value={formData.sectionId.replace('sc_', '')}
+                  onChange={(e) => {
+                    const number = e.target.value;
+                    setFormData({...formData, sectionId: number ? `sc_${number}` : ''});
+                  }}
+                  className="rounded-l-none flex-1"
+                />
+              </div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">
+                Example: SC_1, SC_2, SC_3...
+              </div>
             </div>
 
             {/* Signal Status */}
@@ -369,6 +364,19 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
             </div>
           </div>
         </form>
+        
+        {/* Prediction Results Display */}
+        {predictionResult && (
+          <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border">
+            <h3 className="text-lg font-semibold mb-2 text-slate-800 dark:text-slate-200">
+              Prediction Results
+            </h3>
+            <div className="text-sm text-slate-600 dark:text-slate-400">
+              <pre className="whitespace-pre-wrap">{predictionResult}</pre>
+            </div>
+          </div>
+        )}
+        
         <input
           type="file"
           ref={fileInputRef}

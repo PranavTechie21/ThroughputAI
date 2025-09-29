@@ -1,8 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, Link, Outlet } from 'react-router-dom';
-import { VisualizationCharts } from './components/VisualizationCharts';
-import { Train, Activity, AlertTriangle, TrendingUp, Settings, Award, FileText } from 'lucide-react';
-import { InputDataPanel } from './components/InputDataPanel';
 import {
   Menubar,
   MenubarMenu,
@@ -11,16 +8,10 @@ import {
   MenubarItem,
   MenubarSeparator,
 } from './components/ui/menubar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { ThemeToggle } from './components/ThemeToggle';
-import { ControllerMessage } from './components/ControllerMessage';
-import { PredictionDashboard } from './components/PredictionDashboard';
 import { Toaster } from './components/ui/toaster';
 import { motion } from 'framer-motion';
-import { TrendsSection } from './components/TrendsSection';
-import { AchievementsSection } from './components/AchievementsSection';
-import { ControllerRecordsSection } from './components/ControllerRecordsSection';
 import Login from './pages/Login';
 import { ConfigurationPage } from './pages/Configuration';
 import { AnalyticsPage } from './pages/Analytics';
@@ -29,17 +20,62 @@ import { TrendsPage } from './pages/Trends';
 import { AchievementsPage } from './pages/Achievements';
 import { RecordsPage } from './pages/Records';
 import { DashboardHomePage } from './pages/DashboardHomePage';
+import LandingPage from './pages/LandingPage';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { useTranslation } from './hooks/useTranslation';
 
+// Type definitions
+interface PredictionData {
+  delay: {
+    minutes: number;
+    confidence: number;
+    status: 'warning' | 'green' | 'danger';
+  };
+  conflict: {
+    probability: number;
+    risk: 'low' | 'medium' | 'high';
+    confidence: number;
+  };
+  throughput: {
+    current: number;
+    potential: number;
+    trend: string;
+  };
+}
+
+interface ControllerMessage {
+  priority: string;
+  title: string;
+  body: string;
+  expectedResult: string;
+  reason: string;
+  confidence: number;
+  computeTime: number;
+  timestamp: Date;
+}
+
+interface TrendsMessage {
+  title: string;
+  description: string;
+}
+
+interface DashboardProps {
+  onLogout: () => void;
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+  predictionResult: PredictionData | null;
+  handlePrediction: (result: any) => void;
+  controllerMessage: ControllerMessage;
+}
+
 // Mock data for demonstration
-const mockPredictionData = {
-  delay: { minutes: 14, confidence: 95.2, status: 'warning' },
-  conflict: { probability: 25, risk: 'medium', confidence: 88.9 },
+const mockPredictionData: PredictionData = {
+  delay: { minutes: 14, confidence: 95.2, status: 'warning' as const },
+  conflict: { probability: 25, risk: 'medium' as const, confidence: 88.9 },
   throughput: { current: 85, potential: 92, trend: '+7.2%' }
 };
 
-const mockControllerMessage = {
+const mockControllerMessage: ControllerMessage = {
   priority: 'High Priority',
   title: 'Recommendation: Let other Train Pass',
   body: 'Delay is about 14 mins. Let other Train Pass if its arrival time falls before the departure time.',
@@ -50,14 +86,14 @@ const mockControllerMessage = {
   timestamp: new Date()
 };
 
-const mockTrendsMessage = {
+const mockTrendsMessage: TrendsMessage = {
   title: "Operational Trends",
   description: "Analysis of recent operational data shows a positive trend in on-time arrivals. Further details and historical data are available in the analytics section."
 };
 
-function Dashboard({ onLogout, isDarkMode, toggleDarkMode, predictionResult, handlePrediction, controllerMessage }) {
+function Dashboard({ onLogout, isDarkMode, toggleDarkMode, predictionResult, handlePrediction, controllerMessage }: DashboardProps) {
     const { t } = useTranslation();
-    const [predictions, setPredictions] = useState(mockPredictionData);
+    const [predictions, setPredictions] = useState<PredictionData>(mockPredictionData);
     const [lastUpdated, setLastUpdated] = useState(new Date());
 
     useEffect(() => {
@@ -71,9 +107,21 @@ function Dashboard({ onLogout, isDarkMode, toggleDarkMode, predictionResult, han
         if (predictionResult) return; // Don't simulate if we have a real prediction
         const interval = setInterval(() => {
             setPredictions(prev => ({
-                delay: { ...prev.delay, minutes: Math.max(0, prev.delay.minutes + (Math.random() - 0.5) * 2), confidence: Math.max(70, Math.min(99, prev.delay.confidence + (Math.random() - 0.5) * 5)) },
-                conflict: { ...prev.conflict, probability: Math.max(0, Math.min(100, prev.conflict.probability + (Math.random() - 0.5) * 5)), confidence: Math.max(70, Math.min(99, prev.conflict.confidence + (Math.random() - 0.5) * 3)) },
-                throughput: { ...prev.throughput, current: Math.max(60, Math.min(100, prev.throughput.current + (Math.random() - 0.5) * 3)), potential: Math.max(70, Math.min(100, prev.throughput.potential + (Math.random() - 0.5) * 2)) }
+                delay: { 
+                    ...prev.delay, 
+                    minutes: Math.max(0, prev.delay.minutes + (Math.random() - 0.5) * 2), 
+                    confidence: Math.max(70, Math.min(99, prev.delay.confidence + (Math.random() - 0.5) * 5)) 
+                },
+                conflict: { 
+                    ...prev.conflict, 
+                    probability: Math.max(0, Math.min(100, prev.conflict.probability + (Math.random() - 0.5) * 5)), 
+                    confidence: Math.max(70, Math.min(99, prev.conflict.confidence + (Math.random() - 0.5) * 3)) 
+                },
+                throughput: { 
+                    ...prev.throughput, 
+                    current: Math.max(60, Math.min(100, prev.throughput.current + (Math.random() - 0.5) * 3)), 
+                    potential: Math.max(70, Math.min(100, prev.throughput.potential + (Math.random() - 0.5) * 2)) 
+                }
             }));
             setLastUpdated(new Date());
         }, 5000);
@@ -133,24 +181,24 @@ function Dashboard({ onLogout, isDarkMode, toggleDarkMode, predictionResult, han
                     </div>
                     <div className="mt-4 flex items-center justify-between">
                         <nav className="flex flex-wrap items-center gap-2">
-                            <Link to="/" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('home')}</Link>
-                            <Link to="/configuration" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('configuration')}</Link>
-                            <Link to="/analytics" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('analytics')}</Link>
-                            <Link to="/status" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('systemStatus')}</Link>
-                            <Link to="/trends" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('trends')}</Link>
-                            <Link to="/achievements" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('achievements')}</Link>
-                            <Link to="/records" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('controllerRecords')}</Link>
+                            <Link to="/dashboard" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('home')}</Link>
+                            <Link to="/dashboard/configuration" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('configuration')}</Link>
+                            <Link to="/dashboard/analytics" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('analytics')}</Link>
+                            <Link to="/dashboard/status" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('systemStatus')}</Link>
+                            <Link to="/dashboard/trends" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('trends')}</Link>
+                            <Link to="/dashboard/achievements" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('achievements')}</Link>
+                            <Link to="/dashboard/records" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('controllerRecords')}</Link>
                         </nav>
                         <div className="hidden md:flex">
                             <Menubar className="bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 backdrop-blur-md">
                                 <MenubarMenu>
                                     <MenubarTrigger>{t('insights')}</MenubarTrigger>
                                     <MenubarContent align="end">
-                                        <MenubarItem asChild><Link to="/trends">{t('trends')}</Link></MenubarItem>
-                                        <MenubarItem asChild><Link to="/achievements">{t('previousAchievements')}</Link></MenubarItem>
-                                        <MenubarItem asChild><Link to="/records">{t('controllerRecords')}</Link></MenubarItem>
+                                        <MenubarItem asChild><Link to="/dashboard/trends">{t('trends')}</Link></MenubarItem>
+                                        <MenubarItem asChild><Link to="/dashboard/achievements">{t('previousAchievements')}</Link></MenubarItem>
+                                        <MenubarItem asChild><Link to="/dashboard/records">{t('controllerRecords')}</Link></MenubarItem>
                                         <MenubarSeparator />
-                                        <MenubarItem asChild><Link to="/analytics">{t('openAnalytics')}</Link></MenubarItem>
+                                        <MenubarItem asChild><Link to="/dashboard/analytics">{t('openAnalytics')}</Link></MenubarItem>
                                     </MenubarContent>
                                 </MenubarMenu>
                             </Menubar>
@@ -178,20 +226,20 @@ function AppContent() {
         return false;
     });
     const navigate = useNavigate();
-    const [predictionResult, setPredictionResult] = useState(null);
-    const [controllerMessage, setControllerMessage] = useState(mockControllerMessage);
+    const [predictionResult, setPredictionResult] = useState<PredictionData | null>(null);
+    const [controllerMessage, setControllerMessage] = useState<ControllerMessage>(mockControllerMessage);
 
-    const handlePrediction = (result) => {
+    const handlePrediction = (result: any) => {
         const predictionData = JSON.parse(result.prediction);
-        const newResult = {
-            delay: { minutes: parseFloat(predictionData.predicted_delay), confidence: 95.2, status: 'warning' },
-            conflict: { probability: parseFloat(predictionData.predicted_conflict_probability) * 100, risk: 'medium', confidence: 88.9 },
+        const newResult: PredictionData = {
+            delay: { minutes: parseFloat(predictionData.predicted_delay), confidence: 95.2, status: 'warning' as const },
+            conflict: { probability: parseFloat(predictionData.predicted_conflict_probability) * 100, risk: 'medium' as const, confidence: 88.9 },
             throughput: { current: 85, potential: parseFloat(predictionData.predicted_throughput), trend: '+7.2%' }
         };
         setPredictionResult(newResult);
 
         if (predictionData.ai_recommendations && predictionData.ai_recommendations.length > 0) {
-            const newControllerMessage = {
+            const newControllerMessage: ControllerMessage = {
                 ...mockControllerMessage,
                 priority: 'High Priority',
                 title: 'AI Recommendation',
@@ -205,13 +253,13 @@ function AppContent() {
 
     const handleLoginSuccess = () => {
         setIsLoggedIn(true);
-        navigate('/');
+        navigate('/dashboard');
     };
 
     const handleLogout = () => {
         localStorage.removeItem('isLoggedIn');
         setIsLoggedIn(false);
-        navigate('/login');
+        navigate('/');
     };
 
     const toggleDarkMode = () => {
@@ -225,15 +273,15 @@ function AppContent() {
     };
 
     useEffect(() => {
-        if (!isLoggedIn) {
-            navigate('/login');
-        }
+        // Don't automatically redirect - let users see the landing page first
+        // Only redirect if they're trying to access protected routes while not logged in
     }, [isLoggedIn, navigate]);
 
     return (
         <Routes>
+            <Route path="/" element={!isLoggedIn ? <LandingPage /> : <Navigate to="/dashboard" />} />
             <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
-            <Route path="/" element={isLoggedIn ? <Dashboard onLogout={handleLogout} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} predictionResult={predictionResult} handlePrediction={handlePrediction} controllerMessage={controllerMessage} /> : <Navigate to="/login" />}>
+            <Route path="/dashboard" element={isLoggedIn ? <Dashboard onLogout={handleLogout} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} predictionResult={predictionResult} handlePrediction={handlePrediction} controllerMessage={controllerMessage} /> : <Navigate to="/" />}>
                 <Route index element={<DashboardHomePage />} />
                 <Route path="configuration" element={<ConfigurationPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
@@ -242,7 +290,7 @@ function AppContent() {
                 <Route path="achievements" element={<AchievementsPage />} />
                 <Route path="records" element={<RecordsPage />} />
             </Route>
-            <Route path="*" element={<Navigate to={isLoggedIn ? "/" : "/login"} />} />
+            <Route path="*" element={<Navigate to="/" />} />
         </Routes>
     );
 }

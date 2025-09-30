@@ -68,16 +68,16 @@ export function VisualizationCharts({ predictions }: VisualizationChartsProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-semibold flex items-center space-x-2">
+      <h2 className="text-lg font-semibold flex items-center space-x-2 text-slate-800 dark:text-slate-100">
         <Activity className="h-5 w-5" />
         <span>Analytics & Visualization</span>
       </h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Delay Trend Chart */}
-        <Card>
+        <Card className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 shadow-xl">
           <CardHeader>
-            <CardTitle className="text-base flex items-center space-x-2">
+            <CardTitle className="text-base flex items-center space-x-2 text-slate-800 dark:text-slate-100">
               <TrendingUp className="h-4 w-4" />
               <span>Delay Trends (Last 7 Hours)</span>
             </CardTitle>
@@ -85,10 +85,12 @@ export function VisualizationCharts({ predictions }: VisualizationChartsProps) {
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={delayTrendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" strokeOpacity={0.5} />
+                <XAxis dataKey="time" stroke="#64748b" tick={{ fill: '#64748b' }} tickLine={false} axisLine={false} />
+                <YAxis stroke="#64748b" tick={{ fill: '#64748b' }} tickLine={false} axisLine={false} />
                 <Tooltip 
+                  contentStyle={{ background: '#1e293b', color: '#fff', borderRadius: 8, border: 'none' }}
+                  itemStyle={{ color: '#fff' }}
                   formatter={(value, name) => [
                     `${value} min`, 
                     name === 'delay' ? 'Actual' : 'Predicted'
@@ -97,14 +99,14 @@ export function VisualizationCharts({ predictions }: VisualizationChartsProps) {
                 <Line 
                   type="monotone" 
                   dataKey="delay" 
-                  stroke="#8884d8" 
+                  stroke="#6366f1" 
                   strokeWidth={2}
                   name="delay"
                 />
                 <Line 
                   type="monotone" 
                   dataKey="predicted" 
-                  stroke="#82ca9d" 
+                  stroke="#22d3ee" 
                   strokeWidth={2}
                   strokeDasharray="5 5"
                   name="predicted"
@@ -115,9 +117,9 @@ export function VisualizationCharts({ predictions }: VisualizationChartsProps) {
         </Card>
 
         {/* Throughput Performance */}
-        <Card>
+        <Card className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 shadow-xl">
           <CardHeader>
-            <CardTitle className="text-base flex items-center space-x-2">
+            <CardTitle className="text-base flex items-center space-x-2 text-slate-800 dark:text-slate-100">
               <BarChart3 className="h-4 w-4" />
               <span>Hourly Throughput (%)</span>
             </CardTitle>
@@ -125,13 +127,13 @@ export function VisualizationCharts({ predictions }: VisualizationChartsProps) {
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={throughputData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="hour" />
-                <YAxis />
-                <Tooltip formatter={(value) => [`${value}%`, 'Throughput']} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" strokeOpacity={0.5} />
+                <XAxis dataKey="hour" stroke="#64748b" tick={{ fill: '#64748b' }} tickLine={false} axisLine={false} />
+                <YAxis stroke="#64748b" tick={{ fill: '#64748b' }} tickLine={false} axisLine={false} />
+                <Tooltip contentStyle={{ background: '#1e293b', color: '#fff', borderRadius: 8, border: 'none' }} itemStyle={{ color: '#fff' }} formatter={(value) => [`${value}%`, 'Throughput']} />
                 <Bar 
                   dataKey="throughput" 
-                  fill="#8884d8"
+                  fill="#6366f1"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>
@@ -140,9 +142,9 @@ export function VisualizationCharts({ predictions }: VisualizationChartsProps) {
         </Card>
 
         {/* Section-wise Conflicts */}
-        <Card>
+        <Card className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 shadow-xl">
           <CardHeader>
-            <CardTitle className="text-base flex items-center space-x-2">
+            <CardTitle className="text-base flex items-center space-x-2 text-slate-800 dark:text-slate-100">
               <BarChart3 className="h-4 w-4" />
               <span>Conflicts by Section</span>
             </CardTitle>
@@ -150,21 +152,21 @@ export function VisualizationCharts({ predictions }: VisualizationChartsProps) {
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={conflictBySection}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="section" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="conflicts" fill="#ff7300" name="Conflicts" />
-                <Bar dataKey="capacity" fill="#82ca9d" name="Capacity" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" strokeOpacity={0.5} />
+                <XAxis dataKey="section" stroke="#64748b" tick={{ fill: '#64748b' }} tickLine={false} axisLine={false} />
+                <YAxis stroke="#64748b" tick={{ fill: '#64748b' }} tickLine={false} axisLine={false} />
+                <Tooltip contentStyle={{ background: '#1e293b', color: '#fff', borderRadius: 8, border: 'none' }} itemStyle={{ color: '#fff' }} />
+                <Bar dataKey="conflicts" fill="#f59e42" name="Conflicts" />
+                <Bar dataKey="capacity" fill="#22d3ee" name="Capacity" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         {/* Train Type Distribution */}
-        <Card>
+        <Card className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 shadow-xl">
           <CardHeader>
-            <CardTitle className="text-base flex items-center space-x-2">
+            <CardTitle className="text-base flex items-center space-x-2 text-slate-800 dark:text-slate-100">
               <PieChartIcon className="h-4 w-4" />
               <span>Train Type Distribution</span>
             </CardTitle>
@@ -177,7 +179,7 @@ export function VisualizationCharts({ predictions }: VisualizationChartsProps) {
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
-                  fill="#8884d8"
+                  fill="#6366f1"
                   dataKey="value"
                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                 >
@@ -185,7 +187,7 @@ export function VisualizationCharts({ predictions }: VisualizationChartsProps) {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={{ background: '#1e293b', color: '#fff', borderRadius: 8, border: 'none' }} itemStyle={{ color: '#fff' }} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -193,20 +195,19 @@ export function VisualizationCharts({ predictions }: VisualizationChartsProps) {
       </div>
 
       {/* Real-time Heatmap Simulation */}
-      <Card>
+      <Card className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 shadow-xl">
         <CardHeader>
-          <CardTitle className="text-base">Network Status Heatmap</CardTitle>
+          <CardTitle className="text-base text-slate-800 dark:text-slate-100">Network Status Heatmap</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-7 gap-2 h-32">
             {Array.from({ length: 49 }, (_, i) => {
               const intensity = Math.random();
               const getColor = () => {
-                if (intensity < 0.3) return 'bg-green-200 dark:bg-green-800';
-                if (intensity < 0.6) return 'bg-yellow-200 dark:bg-yellow-800';
-                return 'bg-red-200 dark:bg-red-800';
+                if (intensity < 0.3) return 'bg-green-300 dark:bg-green-700';
+                if (intensity < 0.6) return 'bg-yellow-300 dark:bg-yellow-700';
+                return 'bg-red-300 dark:bg-red-700';
               };
-              
               return (
                 <div
                   key={i}
@@ -216,7 +217,7 @@ export function VisualizationCharts({ predictions }: VisualizationChartsProps) {
               );
             })}
           </div>
-          <div className="flex items-center justify-between mt-4 text-xs text-muted-foreground">
+          <div className="flex items-center justify-between mt-4 text-xs text-slate-600 dark:text-slate-300">
             <span>Low Load</span>
             <span>Network Load Intensity</span>
             <span>High Load</span>

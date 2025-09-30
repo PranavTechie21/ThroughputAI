@@ -1,0 +1,11 @@
+{
+  "trainType": "express",
+  "sectionId": "sc_1", 
+  "priority": 2,
+  "scheduledArrival": "10:30",
+  "scheduledDeparture": "10:45",
+  "platformAvailable": true,
+  "signalStatus": "green",
+  "trackCapacity": 2,
+  "hour": 10
+}

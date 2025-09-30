@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
@@ -20,13 +19,38 @@ interface PredictionData {
     current: number;
     trend: string;
   };
+  aiRecommendations?: string[];
+  optimizedSchedule?: any;
 }
 
 interface PredictionDashboardProps {
-  predictions: PredictionData;
+  predictions?: PredictionData | null;
 }
 
 export function PredictionDashboard({ predictions }: PredictionDashboardProps) {
+  // Default values for when predictions are null or undefined
+  const defaultPredictions: PredictionData = {
+    delay: {
+      minutes: 0,
+      confidence: 0,
+      status: 'green'
+    },
+    conflict: {
+      probability: 0,
+      risk: 'low',
+      confidence: 0
+    },
+    throughput: {
+      target: 100,
+      current: 0,
+      trend: '+0.0%'
+    },
+    aiRecommendations: [],
+    optimizedSchedule: null
+  };
+
+  const data = predictions || defaultPredictions;
+  const hasData = predictions !== null && predictions !== undefined;
   const getDelayColor = (status: string) => {
     switch (status) {
       case 'green':
@@ -83,10 +107,10 @@ export function PredictionDashboard({ predictions }: PredictionDashboardProps) {
   };
 
   const getThroughputProgress = () => {
-    return (predictions.throughput.current / predictions.throughput.target) * 100;
+    return (data.throughput.current / data.throughput.target) * 100;
   };
 
-  const delayStyles = getDelayStyles(predictions.delay.status);
+  const delayStyles = getDelayStyles(data.delay.status);
 
   return (
     <div className="space-y-6">
@@ -96,11 +120,25 @@ export function PredictionDashboard({ predictions }: PredictionDashboardProps) {
         </div>
         <div>
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Live Predictions</h2>
-          <p className="text-sm text-slate-600 dark:text-slate-400">Real-time AI analysis and forecasting</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            {hasData ? 'Real-time AI analysis and forecasting' : 'Submit input data to see predictions'}
+          </p>
         </div>
       </div>
+
+      {!hasData && (
+        <div className="text-center py-12">
+          <div className="text-slate-500 dark:text-slate-400 text-lg mb-2">
+            No predictions available
+          </div>
+          <div className="text-slate-400 dark:text-slate-500 text-sm">
+            Use the input panel to generate ML predictions
+          </div>
+        </div>
+      )}
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">{hasData && (
+        <>
         {/* Enhanced Delay Prediction */}
         <Card className={`${delayStyles.card} overflow-hidden transition-all duration-500 hover:shadow-xl`}>
           <CardHeader className="pb-4 bg-gradient-to-r from-transparent to-white/50 dark:to-slate-800/30">
@@ -116,8 +154,8 @@ export function PredictionDashboard({ predictions }: PredictionDashboardProps) {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center space-y-2">
-              <div className={`text-4xl font-bold ${getDelayColor(predictions.delay.status)}`}>
-                {predictions.delay.minutes.toFixed(1)}
+              <div className={`text-4xl font-bold ${getDelayColor(data.delay.status)}`}>
+                {data.delay.minutes.toFixed(1)}
               </div>
               <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">minutes average delay</div>
             </div>
@@ -126,24 +164,24 @@ export function PredictionDashboard({ predictions }: PredictionDashboardProps) {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-600 dark:text-slate-400">Confidence Level</span>
                 <Badge variant="outline" className="bg-white/80 dark:bg-slate-700/80 font-semibold">
-                  {predictions.delay.confidence}%
+                  {data.delay.confidence}%
                 </Badge>
               </div>
               
               <div className="relative">
-                <Progress value={predictions.delay.confidence} className="h-3" />
+                <Progress value={data.delay.confidence} className="h-3" />
               </div>
               
               <div className="text-center pt-2">
                 <Badge 
                   className={
-                    predictions.delay.status === 'green' ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0' :
-                    predictions.delay.status === 'warning' ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0' : 
+                    data.delay.status === 'green' ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0' :
+                    data.delay.status === 'warning' ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0' : 
                     'bg-gradient-to-r from-red-500 to-red-600 text-white border-0'
                   }
                 >
-                  {predictions.delay.status === 'green' ? '✓ On Schedule' :
-                   predictions.delay.status === 'warning' ? '⚠ Minor Delays' : '⚠ Major Delays'}
+                  {data.delay.status === 'green' ? '✓ On Schedule' :
+                   data.delay.status === 'warning' ? '⚠ Minor Delays' : '⚠ Major Delays'}
                 </Badge>
               </div>
             </div>
@@ -166,7 +204,7 @@ export function PredictionDashboard({ predictions }: PredictionDashboardProps) {
           <CardContent className="space-y-4">
             <div className="text-center space-y-2">
               <div className="text-4xl font-bold text-orange-600 dark:text-orange-400">
-                {predictions.conflict.probability.toFixed(0)}%
+                {data.conflict.probability.toFixed(0)}%
               </div>
               <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">conflict probability</div>
             </div>
@@ -174,18 +212,18 @@ export function PredictionDashboard({ predictions }: PredictionDashboardProps) {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-600 dark:text-slate-400">Risk Assessment</span>
-                <Badge className={`${getRiskStyles(predictions.conflict.risk)} border-0 font-semibold`}>
-                  {predictions.conflict.risk.toUpperCase()} RISK
+                <Badge className={`${getRiskStyles(data.conflict.risk)} border-0 font-semibold`}>
+                  {data.conflict.risk.toUpperCase()} RISK
                 </Badge>
               </div>
               
               <div className="relative">
-                <Progress value={predictions.conflict.probability} className="h-3" />
+                <Progress value={data.conflict.probability} className="h-3" />
               </div>
               
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-600 dark:text-slate-400">Model Confidence</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200">{predictions.conflict.confidence}%</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">{data.conflict.confidence}%</span>
               </div>
             </div>
           </CardContent>
@@ -207,10 +245,10 @@ export function PredictionDashboard({ predictions }: PredictionDashboardProps) {
           <CardContent className="space-y-4">
             <div className="text-center space-y-2">
               <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">
-                {predictions.throughput.current.toFixed(0)}%
+                {data.throughput.current.toFixed(0)}%
               </div>
               <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">
-                of {predictions.throughput.target}% target capacity
+                of {data.throughput.target}% target capacity
               </div>
             </div>
             
@@ -223,12 +261,12 @@ export function PredictionDashboard({ predictions }: PredictionDashboardProps) {
                 <span className="text-sm text-slate-600 dark:text-slate-400">24h Trend</span>
                 <Badge 
                   className={
-                    predictions.throughput.trend.startsWith('+') 
+                    data.throughput.trend.startsWith('+') 
                       ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white border-0' 
                       : 'bg-gradient-to-r from-red-500 to-red-600 text-white border-0'
                   }
                 >
-                  {predictions.throughput.trend}
+                  {data.throughput.trend}
                 </Badge>
               </div>
               
@@ -248,6 +286,8 @@ export function PredictionDashboard({ predictions }: PredictionDashboardProps) {
             </div>
           </CardContent>
         </Card>
+        </>
+      )}
       </div>
     </div>
   );

@@ -7,6 +7,9 @@ const { GridFSBucket } = require('mongodb');
 const path = require('path');
 const { spawn } = require('child_process');
 
+// Load environment variables
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -14,10 +17,19 @@ app.use(express.json());
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/railway_dashboard';
 
-mongoose.connect(MONGO_URI).then(() => {
-  console.log('MongoDB connected');
+// MongoDB connection with better options for Atlas
+mongoose.connect(MONGO_URI, {
+  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+  socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+}).then(() => {
+  console.log('✅ MongoDB connected successfully');
+  console.log(`🔗 Connected to: ${MONGO_URI.includes('mongodb+srv') ? 'MongoDB Atlas' : 'Local MongoDB'}`);
 }).catch((e) => {
-  console.error('Mongo connect error', e);
+  console.error('❌ MongoDB connection error:', e.message);
+  if (MONGO_URI.includes('<username>') || MONGO_URI.includes('<password>') || MONGO_URI.includes('<cluster-url>')) {
+    console.error('💡 Please update your .env file with actual MongoDB Atlas credentials');
+    console.error('📚 See .env.example for setup instructions');
+  }
 });
 
 const userSchema = new mongoose.Schema({

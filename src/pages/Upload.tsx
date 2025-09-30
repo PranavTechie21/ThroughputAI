@@ -12,7 +12,7 @@ import {
   MenubarItem,
   MenubarSeparator,
 } from '../components/ui/menubar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+// ...existing code...
 import { Button } from '../components/ui/button';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { ControllerMessage } from '../components/ControllerMessage';
@@ -53,18 +53,7 @@ const mockControllerMessage = {
 };
 
 
-// Placeholder components for new sections
-const SystemStatus = () => (
-  <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200 dark:border-slate-700">
-    <CardHeader>
-      <CardTitle className="text-xl font-semibold text-slate-800 dark:text-slate-100">System Status</CardTitle>
-      <CardDescription className="text-slate-600 dark:text-slate-400">Overview of current system status</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <p>Detailed system status information would be displayed here.</p>
-    </CardContent>
-  </Card>
-);
+// System Status was removed per user request
 
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -299,9 +288,7 @@ export default function App() {
                   <VisualizationCharts predictions={predictions} />
                 </TabsContent>
 
-                <TabsContent value="status" className="mt-8">
-                  <SystemStatus />
-                </TabsContent>
+                {/* System Status tab removed */}
 
               </motion.div>
             </AnimatePresence>

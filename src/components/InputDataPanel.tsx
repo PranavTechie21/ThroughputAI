@@ -84,40 +84,64 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
 
       const result = await response.json();
       console.log('Parsed JSON from server:', result);
-      
-      // Parse the prediction string returned from Python script
-      let parsedPrediction;
-      try {
-        parsedPrediction = JSON.parse(result.prediction);
-      } catch (parseError) {
-        console.error('Failed to parse prediction JSON:', parseError);
-        throw new Error('Invalid prediction response format');
+
+      // Backend returns { prediction: <object> } (or sometimes a string).
+      // Accept both shapes for robustness.
+      let parsedPrediction: any = null;
+      if (!result) throw new Error('Empty response from prediction server');
+      if (typeof result.prediction === 'string') {
+        try {
+          parsedPrediction = JSON.parse(result.prediction);
+        } catch (parseError) {
+          console.error('Failed to parse prediction JSON string:', parseError);
+          throw new Error('Invalid prediction response format');
+        }
+      } else if (typeof result.prediction === 'object') {
+        parsedPrediction = result.prediction;
+      } else {
+        // Fallback: if server returned prediction fields at top-level
+        parsedPrediction = result;
       }
 
       setPredictionResult(parsedPrediction);
       
       // Transform the data for the dashboard component
-      const transformedData = {
-        delay: {
-          minutes: parseFloat(parsedPrediction.predicted_delay.replace(' mins', '')),
-          confidence: 85, // Default confidence level
-          status: parseFloat(parsedPrediction.predicted_delay.replace(' mins', '')) < 5 ? 'green' : 
-                  parseFloat(parsedPrediction.predicted_delay.replace(' mins', '')) < 15 ? 'warning' : 'danger'
-        },
-        conflict: {
-          probability: parseFloat(parsedPrediction.predicted_conflict_probability) * 100,
-          risk: parseFloat(parsedPrediction.predicted_conflict_probability) < 0.3 ? 'low' : 
-                parseFloat(parsedPrediction.predicted_conflict_probability) < 0.7 ? 'medium' : 'high',
-          confidence: 90
-        },
-        throughput: {
-          target: 100,
-          current: parseFloat(parsedPrediction.predicted_throughput),
-          trend: '+2.3%'
-        },
-        aiRecommendations: parsedPrediction.ai_recommendations || [],
-        optimizedSchedule: parsedPrediction.optimized_schedule || null
-      };
+        // Helper to coerce predicted values to numbers when the ML server returns numbers
+        const toNumber = (v: any) => {
+          if (v === null || v === undefined) return 0;
+          if (typeof v === 'number') return v;
+          if (typeof v === 'string') {
+            // remove common suffixes like ' mins' and commas
+            return parseFloat(v.replace(/[,]/g, '').replace(/\s*mins?/i, '')) || 0;
+          }
+          // fallback
+          return Number(v) || 0;
+        };
+
+        // Transform the data for the dashboard component
+        const delayMinutes = toNumber(parsedPrediction.predicted_delay);
+        const conflictRaw = toNumber(parsedPrediction.predicted_conflict_probability);
+        const throughputRaw = toNumber(parsedPrediction.predicted_throughput);
+
+        const transformedData = {
+          delay: {
+            minutes: delayMinutes,
+            confidence: 85, // Default confidence level
+            status: delayMinutes < 5 ? 'green' : delayMinutes < 15 ? 'warning' : 'danger'
+          },
+          conflict: {
+            probability: conflictRaw * 100,
+            risk: conflictRaw < 0.3 ? 'low' : conflictRaw < 0.7 ? 'medium' : 'high',
+            confidence: 90
+          },
+          throughput: {
+            target: 100,
+            current: throughputRaw,
+            trend: '+2.3%'
+          },
+          aiRecommendations: parsedPrediction.ai_recommendations || [],
+          optimizedSchedule: parsedPrediction.optimized_schedule || null
+        };
       
       onPredict(transformedData);
       navigate('/dashboard/home');

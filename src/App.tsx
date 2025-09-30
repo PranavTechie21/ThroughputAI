@@ -15,7 +15,6 @@ import { motion } from 'framer-motion';
 import Login from './pages/Login';
 import { ConfigurationPage } from './pages/Configuration';
 import { AnalyticsPage } from './pages/Analytics';
-import { SystemStatusPage } from './pages/SystemStatus';
 import { DashboardHomePage } from './pages/DashboardHomePage';
 import LandingPage from './pages/LandingPage';
 import Prediction from './pages/Prediction';
@@ -186,7 +185,7 @@ function Dashboard({ onLogout, isDarkMode, toggleDarkMode, predictionResult, han
                             <Link to="/dashboard/prediction" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">Prediction</Link>
                             <Link to="/dashboard/configuration" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('configuration')}</Link>
                             <Link to="/dashboard/analytics" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('analytics')}</Link>
-                            <Link to="/dashboard/status" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('systemStatus')}</Link>
+                            {/* System Status removed per request */}
                             {/* Removed Trends and Achievements tabs */}
                             {/* Removed Controller Records tab */}
                         </nav>
@@ -295,7 +294,7 @@ function AppContent() {
                 <Route path="prediction" element={<Prediction />} />
                 <Route path="configuration" element={<ConfigurationPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
-                <Route path="status" element={<SystemStatusPage />} />
+                {/* System Status route removed */}
                 {/* Removed Trends and Achievements routes */}
                 {/* Removed Controller Records route */}
             </Route>

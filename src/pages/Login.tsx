@@ -102,9 +102,6 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 Sign In
               </Button>
             </form>
-            <p className="mt-4 text-center text-sm text-neutral-500 dark:text-neutral-400">
-              Hint: Use username 'user' and password 'password'.
-            </p>
           </CardContent>
         </Card>
       </motion.div>

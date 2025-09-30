@@ -70,7 +70,7 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:5000/api/predict', {
+      const response = await fetch('http://localhost:3001/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

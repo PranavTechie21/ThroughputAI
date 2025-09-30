@@ -16,9 +16,6 @@ import Login from './pages/Login';
 import { ConfigurationPage } from './pages/Configuration';
 import { AnalyticsPage } from './pages/Analytics';
 import { SystemStatusPage } from './pages/SystemStatus';
-import { TrendsPage } from './pages/Trends';
-import { AchievementsPage } from './pages/Achievements';
-import { RecordsPage } from './pages/Records';
 import { DashboardHomePage } from './pages/DashboardHomePage';
 import LandingPage from './pages/LandingPage';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
@@ -174,29 +171,28 @@ function Dashboard({ onLogout, isDarkMode, toggleDarkMode, predictionResult, han
                             <div className="px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full text-sm font-medium border border-emerald-200 dark:border-emerald-700">
                                 {t('live')} • {lastUpdated.toLocaleTimeString()}
                             </div>
-                            <LanguageSwitcher />
-                            <Button onClick={onLogout} variant="outline">{t('logout')}</Button>
+                            <div className="dark:text-white">
+                                <LanguageSwitcher />
+                            </div>
+                            <Button onClick={onLogout} variant="outline" className="dark:text-white">{t('logout')}</Button>
                             <ThemeToggle isDark={isDarkMode} onToggle={toggleDarkMode} />
                         </div>
                     </div>
                     <div className="mt-4 flex items-center justify-between">
                         <nav className="flex flex-wrap items-center gap-2">
-                            <Link to="/dashboard" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('home')}</Link>
-                            <Link to="/dashboard/configuration" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('configuration')}</Link>
-                            <Link to="/dashboard/analytics" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('analytics')}</Link>
-                            <Link to="/dashboard/status" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('systemStatus')}</Link>
-                            <Link to="/dashboard/trends" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('trends')}</Link>
-                            <Link to="/dashboard/achievements" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('achievements')}</Link>
-                            <Link to="/dashboard/records" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">{t('controllerRecords')}</Link>
+                            <Link to="/dashboard" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('home')}</Link>
+                            <Link to="/dashboard/configuration" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('configuration')}</Link>
+                            <Link to="/dashboard/analytics" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('analytics')}</Link>
+                            <Link to="/dashboard/status" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('systemStatus')}</Link>
+                            {/* Removed Trends and Achievements tabs */}
+                            {/* Removed Controller Records tab */}
                         </nav>
                         <div className="hidden md:flex">
                             <Menubar className="bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 backdrop-blur-md">
                                 <MenubarMenu>
                                     <MenubarTrigger>{t('insights')}</MenubarTrigger>
                                     <MenubarContent align="end">
-                                        <MenubarItem asChild><Link to="/dashboard/trends">{t('trends')}</Link></MenubarItem>
-                                        <MenubarItem asChild><Link to="/dashboard/achievements">{t('previousAchievements')}</Link></MenubarItem>
-                                        <MenubarItem asChild><Link to="/dashboard/records">{t('controllerRecords')}</Link></MenubarItem>
+                                        {/* Removed Trends, Achievements, and Controller Records from Menubar */}
                                         <MenubarSeparator />
                                         <MenubarItem asChild><Link to="/dashboard/analytics">{t('openAnalytics')}</Link></MenubarItem>
                                     </MenubarContent>
@@ -286,9 +282,8 @@ function AppContent() {
                 <Route path="configuration" element={<ConfigurationPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="status" element={<SystemStatusPage />} />
-                <Route path="trends" element={<TrendsPage />} />
-                <Route path="achievements" element={<AchievementsPage />} />
-                <Route path="records" element={<RecordsPage />} />
+                {/* Removed Trends and Achievements routes */}
+                {/* Removed Controller Records route */}
             </Route>
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>

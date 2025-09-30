@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { VisualizationCharts } from '../components/VisualizationCharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Activity, AlertTriangle, TrendingUp, Settings, Award, FileText } from 'lucide-react';
+import { Activity, AlertTriangle, Settings } from 'lucide-react';
 import { InputDataPanel } from '../components/InputDataPanel';
 import {
   Menubar,
@@ -19,9 +19,6 @@ import { ControllerMessage } from '../components/ControllerMessage';
 import { PredictionDashboard } from '../components/PredictionDashboard';
 import { Toaster } from '../components/ui/toaster';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendsSection } from '../components/TrendsSection';
-import { AchievementsSection } from '../components/AchievementsSection';
-import { ControllerRecordsSection } from '../components/ControllerRecordsSection';
 import Login from './Login';
 import LandingPage from './LandingPage';
 
@@ -55,10 +52,6 @@ const mockControllerMessage = {
   timestamp: new Date()
 };
 
-const mockTrendsMessage = {
-  title: 'Trends Analysis',
-  description: 'Current performance trends show improving efficiency. Overall system throughput has increased by 12% this month with reduced average delays.'
-};
 
 // Placeholder components for new sections
 const SystemStatus = () => (
@@ -236,24 +229,14 @@ export default function App() {
               <a href="#configuration" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">Configuration</a>
               <a href="#analytics" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">Analytics</a>
               <a href="#status" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">System Status</a>
-              <a href="#trends" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">Trends</a>
-              <a href="#achievements" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">Achievements</a>
-              <a href="#records" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white transition">Controller Records</a>
+              {/* Removed Trends, Achievements, and Controller Records from nav */}
             </nav>
             <div className="hidden md:flex">
               <Menubar className="bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 backdrop-blur-md">
                 <MenubarMenu>
                   <MenubarTrigger>Insights</MenubarTrigger>
                   <MenubarContent align="end">
-                    <MenubarItem asChild>
-                      <a href="#trends">Trends</a>
-                    </MenubarItem>
-                    <MenubarItem asChild>
-                      <a href="#achievements">Previous Achievements</a>
-                    </MenubarItem>
-                    <MenubarItem asChild>
-                      <a href="#records">Controller Records</a>
-                    </MenubarItem>
+                    {/* Removed Trends, Achievements, and Controller Records from Upload Menubar */}
                     <MenubarSeparator />
                     <MenubarItem asChild>
                       <a href="#analytics">Open Analytics</a>
@@ -284,7 +267,7 @@ export default function App() {
           {/* Secondary Features */}
           <motion.div variants={itemVariants}>
             <Tabs defaultValue="input" className="w-full">
-            <TabsList className="grid w-full grid-cols-6 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border border-slate-200 dark:border-slate-700 p-1">
+            <TabsList className="grid w-full grid-cols-3 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border border-slate-200 dark:border-slate-700 p-1">
               <TabsTrigger id="configuration" value="input" className="flex items-center space-x-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white" onClick={() => setActiveTab('input')}>
                 <Settings className="h-4 w-4" />
                 <span>Configuration</span>
@@ -297,18 +280,7 @@ export default function App() {
                 <AlertTriangle className="h-4 w-4" />
                 <span>System Status</span>
               </TabsTrigger>
-              <TabsTrigger id="trends" value="trends" className="flex items-center space-x-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white" onClick={() => setActiveTab('trends')}>
-                <TrendingUp className="h-4 w-4" />
-                <span>Trends</span>
-              </TabsTrigger>
-              <TabsTrigger id="achievements" value="achievements" className="flex items-center space-x-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white" onClick={() => setActiveTab('achievements')}>
-                <Award className="h-4 w-4" />
-                <span>Achievements</span>
-              </TabsTrigger>
-              <TabsTrigger id="records" value="records" className="flex items-center space-x-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white" onClick={() => setActiveTab('records')}>
-                <FileText className="h-4 w-4" />
-                <span>Records</span>
-              </TabsTrigger>
+              {/* Removed Trends, Achievements, and Controller Records tabs */}
             </TabsList>
 
             <AnimatePresence mode="wait">
@@ -331,42 +303,13 @@ export default function App() {
                   <SystemStatus />
                 </TabsContent>
 
-                <TabsContent value="trends" className="mt-8">
-                  <TrendsSection message={mockTrendsMessage} />
-                </TabsContent>
-
-                <TabsContent value="achievements" className="mt-8">
-                  <AchievementsSection />
-                </TabsContent>
-
-                <TabsContent value="records" className="mt-8">
-                  <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-slate-200 dark:border-slate-700">
-                    <CardHeader>
-                      <CardTitle className="text-xl font-semibold text-slate-800 dark:text-slate-100">Controller Records</CardTitle>
-                      <CardDescription className="text-slate-600 dark:text-slate-400">Historical records of controller actions</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p>Controller records and history would be displayed here.</p>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
               </motion.div>
             </AnimatePresence>
             </Tabs>
           </motion.div>
           
           {/* New Sections */}
-          <section id="trends" className="space-y-4">
-            <TrendsSection message={mockTrendsMessage} />
-          </section>
-
-          <section id="achievements" className="space-y-4">
-            <AchievementsSection />
-          </section>
-
-          <section id="records" className="space-y-4">
-            <ControllerRecordsSection />
-          </section>
+          {/* Removed Trends, Achievements, and Controller Records sections */}
         </motion.div>
         <Toaster />
       </motion.div>

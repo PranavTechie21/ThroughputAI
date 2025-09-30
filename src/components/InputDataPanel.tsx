@@ -147,9 +147,9 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
   };
 
   return (
-    <Card>
+    <Card className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 shadow-xl">
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
+        <CardTitle className="flex items-center space-x-2 text-black dark:text-white">
           <Upload className="h-5 w-5" />
           <span>Input Data Entry Panel</span>
         </CardTitle>
@@ -159,7 +159,7 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Train Type */}
             <div className="space-y-2">
-              <Label htmlFor="trainType">Train Type</Label>
+              <Label htmlFor="trainType" className="text-neutral-700 dark:text-neutral-200">Train Type</Label>
               <Select 
                 value={formData.trainType} 
                 onValueChange={(value) => setFormData({...formData, trainType: value})}
@@ -179,9 +179,9 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
 
             {/* Section ID */}
             <div className="space-y-2">
-              <Label htmlFor="sectionId">Section ID</Label>
+              <Label htmlFor="sectionId" className="text-neutral-700 dark:text-neutral-200">Section ID</Label>
               <div className="flex items-center space-x-2">
-                <span className="px-3 py-2 bg-slate-100 dark:bg-slate-700 border border-r-0 rounded-l-md text-sm font-mono">
+                <span className="px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-r-0 rounded-l-md text-sm font-mono text-black dark:text-white">
                   SC_
                 </span>
                 <Input
@@ -194,17 +194,17 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
                     const number = e.target.value;
                     setFormData({...formData, sectionId: number ? `sc_${number}` : ''});
                   }}
-                  className="rounded-l-none flex-1"
+                  className="rounded-l-none flex-1 bg-white dark:bg-neutral-800 text-black dark:text-white border-slate-200 dark:border-slate-700"
                 />
               </div>
-              <div className="text-xs text-slate-500 dark:text-slate-400">
+              <div className="text-xs text-neutral-500 dark:text-neutral-400">
                 Example: SC_1, SC_2, SC_3...
               </div>
             </div>
 
             {/* Signal Status */}
             <div className="space-y-2">
-              <Label htmlFor="signalStatus">Signal Status</Label>
+              <Label htmlFor="signalStatus" className="text-neutral-700 dark:text-neutral-200">Signal Status</Label>
               <Select 
                 value={formData.signalStatus} 
                 onValueChange={(value) => setFormData({...formData, signalStatus: value})}
@@ -216,8 +216,8 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
                   {signalStatuses.map((status) => (
                     <SelectItem key={status.value} value={status.value}>
                       <div className="flex items-center space-x-2">
-                        <div className={`w-3 h-3 rounded-full ${status.color}`}></div>
-                        <span>{status.label}</span>
+                        <div className={`w-3 h-3 rounded-full border-2 border-black dark:border-white ${status.color}`}></div>
+                        <span className="text-black dark:text-white">{status.label}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -227,31 +227,31 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
 
             {/* Scheduled Arrival */}
             <div className="space-y-2">
-              <Label htmlFor="scheduledArrival">Scheduled Arrival</Label>
+              <Label htmlFor="scheduledArrival" className="text-neutral-700 dark:text-neutral-200">Scheduled Arrival</Label>
               <Input
                 id="scheduledArrival"
                 type="time"
                 value={formData.scheduledArrival}
                 onChange={(e) => setFormData({...formData, scheduledArrival: e.target.value})}
-                className="w-full"
+                className="w-full bg-white dark:bg-neutral-800 text-black dark:text-white border-slate-200 dark:border-slate-700"
               />
             </div>
 
             {/* Scheduled Departure */}
             <div className="space-y-2">
-              <Label htmlFor="scheduledDeparture">Scheduled Departure</Label>
+              <Label htmlFor="scheduledDeparture" className="text-neutral-700 dark:text-neutral-200">Scheduled Departure</Label>
               <Input
                 id="scheduledDeparture"
                 type="time"
                 value={formData.scheduledDeparture}
                 onChange={(e) => setFormData({...formData, scheduledDeparture: e.target.value})}
-                className="w-full"
+                className="w-full bg-white dark:bg-neutral-800 text-black dark:text-white border-slate-200 dark:border-slate-700"
               />
             </div>
 
             {/* Track Capacity */}
             <div className="space-y-2">
-              <Label htmlFor="trackCapacity">Track Capacity</Label>
+              <Label htmlFor="trackCapacity" className="text-neutral-700 dark:text-neutral-200">Track Capacity</Label>
               <Input
                 id="trackCapacity"
                 type="number"
@@ -262,7 +262,7 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
                   const value = e.target.value === '' ? 1 : parseInt(e.target.value);
                   setFormData({...formData, trackCapacity: isNaN(value) ? 1 : Math.max(1, Math.min(10, value))});
                 }}
-                className="w-full"
+                className="w-full bg-white dark:bg-neutral-800 text-black dark:text-white border-slate-200 dark:border-slate-700"
               />
             </div>
           </div>
@@ -273,7 +273,7 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
             {/* Priority Slider */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label>Priority Level</Label>
+                <Label className="text-neutral-700 dark:text-neutral-200">Priority Level</Label>
                 <Badge className={`${getPriorityColor(formData.priority)} text-white`}>
                   {getPriorityLabel(formData.priority)}
                 </Badge>
@@ -286,7 +286,7 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
                 step={1}
                 className="w-full"
               />
-              <div className="flex justify-between text-xs text-muted-foreground">
+              <div className="flex justify-between text-xs text-neutral-500 dark:text-neutral-400">
                 <span>Low</span>
                 <span>Medium</span>
                 <span>High</span>
@@ -295,7 +295,7 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
 
             {/* Platform Availability */}
             <div className="space-y-3">
-              <Label>Platform Availability</Label>
+              <Label className="text-neutral-700 dark:text-neutral-200">Platform Availability</Label>
               <div className="flex items-center space-x-3">
                 <Switch
                   checked={formData.platformAvailable}
@@ -311,7 +311,7 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Hour Input */}
             <div className="space-y-2">
-              <Label htmlFor="hour">Hour of Day (0-23)</Label>
+              <Label htmlFor="hour" className="text-neutral-700 dark:text-neutral-200">Hour of Day (0-23)</Label>
               <Input
                 id="hour"
                 type="number"
@@ -322,7 +322,7 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
                   const value = e.target.value === '' ? 0 : parseInt(e.target.value);
                   setFormData({...formData, hour: isNaN(value) ? 0 : Math.max(0, Math.min(23, value))});
                 }}
-                className="w-full"
+                className="w-full bg-white dark:bg-neutral-800 text-black dark:text-white border-slate-200 dark:border-slate-700"
               />
             </div>
           </div>
@@ -335,7 +335,7 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
               type="button"
               variant="outline"
               onClick={resetForm}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 dark:text-white"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Reset Form</span>
@@ -345,7 +345,7 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
               <Button
                 type="button"
                 variant="outline"
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 dark:text-white"
                 onClick={handleUploadClick}
                 disabled={isUploading}
               >
@@ -356,7 +356,7 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
               <Button
                 type="submit"
                 disabled={isLoading || !formData.trainType || !formData.sectionId}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 dark:text-white"
               >
                 <Play className="h-4 w-4" />
                 <span>{isLoading ? 'Predicting...' : 'Run Prediction'}</span>
@@ -367,11 +367,11 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
         
         {/* Prediction Results Display */}
         {predictionResult && (
-          <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border">
-            <h3 className="text-lg font-semibold mb-2 text-slate-800 dark:text-slate-200">
+          <div className="mt-6 p-4 bg-slate-50 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
+            <h3 className="text-lg font-semibold mb-2 text-slate-800 dark:text-white">
               Prediction Results
             </h3>
-            <div className="text-sm text-slate-600 dark:text-slate-400">
+            <div className="text-sm text-slate-600 dark:text-neutral-300">
               <pre className="whitespace-pre-wrap">{predictionResult}</pre>
             </div>
           </div>

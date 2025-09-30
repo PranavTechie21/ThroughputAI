@@ -26,7 +26,7 @@ interface PredictionData {
   delay: {
     minutes: number;
     confidence: number;
-    status: 'warning' | 'green' | 'danger';
+    status: 'green' | 'warning' | 'danger';
   };
   conflict: {
     probability: number;
@@ -34,10 +34,12 @@ interface PredictionData {
     confidence: number;
   };
   throughput: {
+    target: number;
     current: number;
-    potential: number;
     trend: string;
   };
+  aiRecommendations?: string[];
+  optimizedSchedule?: any;
 }
 
 interface ControllerMessage {
@@ -69,7 +71,7 @@ interface DashboardProps {
 const mockPredictionData: PredictionData = {
   delay: { minutes: 14, confidence: 95.2, status: 'warning' as const },
   conflict: { probability: 25, risk: 'medium' as const, confidence: 88.9 },
-  throughput: { current: 85, potential: 92, trend: '+7.2%' }
+  throughput: { target: 100, current: 85, trend: '+7.2%' }
 };
 
 const mockControllerMessage: ControllerMessage = {
@@ -116,8 +118,7 @@ function Dashboard({ onLogout, isDarkMode, toggleDarkMode, predictionResult, han
                 },
                 throughput: { 
                     ...prev.throughput, 
-                    current: Math.max(60, Math.min(100, prev.throughput.current + (Math.random() - 0.5) * 3)), 
-                    potential: Math.max(70, Math.min(100, prev.throughput.potential + (Math.random() - 0.5) * 2)) 
+                    current: Math.max(60, Math.min(100, prev.throughput.current + (Math.random() - 0.5) * 3))
                 }
             }));
             setLastUpdated(new Date());
@@ -180,7 +181,7 @@ function Dashboard({ onLogout, isDarkMode, toggleDarkMode, predictionResult, han
                     </div>
                     <div className="mt-4 flex items-center justify-between">
                         <nav className="flex flex-wrap items-center gap-2">
-                            <Link to="/dashboard" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('home')}</Link>
+                            <Link to="/dashboard/home" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('home')}</Link>
                             <Link to="/dashboard/configuration" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('configuration')}</Link>
                             <Link to="/dashboard/analytics" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('analytics')}</Link>
                             <Link to="/dashboard/status" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('systemStatus')}</Link>
@@ -225,23 +226,32 @@ function AppContent() {
     const [predictionResult, setPredictionResult] = useState<PredictionData | null>(null);
     const [controllerMessage, setControllerMessage] = useState<ControllerMessage>(mockControllerMessage);
 
-    const handlePrediction = (result: any) => {
-        const predictionData = JSON.parse(result.prediction);
-        const newResult: PredictionData = {
-            delay: { minutes: parseFloat(predictionData.predicted_delay), confidence: 95.2, status: 'warning' as const },
-            conflict: { probability: parseFloat(predictionData.predicted_conflict_probability) * 100, risk: 'medium' as const, confidence: 88.9 },
-            throughput: { current: 85, potential: parseFloat(predictionData.predicted_throughput), trend: '+7.2%' }
-        };
-        setPredictionResult(newResult);
+    const handlePrediction = (result: PredictionData) => {
+        setPredictionResult(result);
 
-        if (predictionData.ai_recommendations && predictionData.ai_recommendations.length > 0) {
+        if (result.aiRecommendations && result.aiRecommendations.length > 0) {
             const newControllerMessage: ControllerMessage = {
-                ...mockControllerMessage,
                 priority: 'High Priority',
-                title: 'AI Recommendation',
-                body: predictionData.ai_recommendations.join('\n'),
+                title: 'AI Scheduler Recommendation',
+                body: result.aiRecommendations.join('\n'),
+                expectedResult: `Reduce average network delay by ~${result.delay.minutes.toFixed(1)} minutes; throughput optimization ${result.throughput.trend}`,
+                reason: `ML model analysis indicates ${result.conflict.probability.toFixed(1)}% conflict probability. Optimized scheduling reduces cascading delays and improves network efficiency.`,
                 timestamp: new Date(),
-                confidence: newResult.conflict.confidence,
+                confidence: result.delay.confidence,
+                computeTime: Math.floor(Math.random() * 500) + 200,
+            };
+            setControllerMessage(newControllerMessage);
+        } else {
+            // Fallback message when no specific recommendations are available
+            const newControllerMessage: ControllerMessage = {
+                priority: result.delay.minutes > 10 ? 'High Priority' : 'Medium Priority',
+                title: 'Train Operations Analysis Complete',
+                body: `Predicted delay: ${result.delay.minutes.toFixed(1)} minutes\nConflict probability: ${result.conflict.probability.toFixed(1)}%\nThroughput: ${result.throughput.current.toFixed(1)}%`,
+                expectedResult: `Current operations forecast shows ${result.throughput.trend} throughput trend with ${result.conflict.risk} risk level`,
+                reason: `ML analysis of current train parameters indicates ${result.delay.status} operational status with ${result.delay.confidence}% confidence`,
+                timestamp: new Date(),
+                confidence: result.delay.confidence,
+                computeTime: Math.floor(Math.random() * 500) + 200,
             };
             setControllerMessage(newControllerMessage);
         }
@@ -249,7 +259,7 @@ function AppContent() {
 
     const handleLoginSuccess = () => {
         setIsLoggedIn(true);
-        navigate('/dashboard');
+        navigate('/dashboard/configuration');
     };
 
     const handleLogout = () => {
@@ -278,7 +288,8 @@ function AppContent() {
             <Route path="/" element={!isLoggedIn ? <LandingPage /> : <Navigate to="/dashboard" />} />
             <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
             <Route path="/dashboard" element={isLoggedIn ? <Dashboard onLogout={handleLogout} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} predictionResult={predictionResult} handlePrediction={handlePrediction} controllerMessage={controllerMessage} /> : <Navigate to="/" />}>
-                <Route index element={<DashboardHomePage />} />
+                <Route index element={<Navigate to="configuration" replace />} />
+                <Route path="home" element={<DashboardHomePage />} />
                 <Route path="configuration" element={<ConfigurationPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="status" element={<SystemStatusPage />} />

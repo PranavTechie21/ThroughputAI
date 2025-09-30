@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import sys
 import json
+import os
 import joblib
 from scipy import sparse
 import tensorflow as tf
@@ -113,8 +114,9 @@ if __name__ == "__main__":
     try:
         input_data = json.loads(sys.argv[1])
 
-        # Load the model and transformers
-        model = tf.keras.models.load_model("multi_task_model.h5", compile=False)
+        # Load the model and transformers from models directory
+        models_dir = os.path.join(os.path.dirname(__file__), 'models')
+        model = tf.keras.models.load_model(os.path.join(models_dir, "multi_task_model.h5"), compile=False)
         model.compile(
             optimizer='adam',
             loss={
@@ -123,9 +125,9 @@ if __name__ == "__main__":
                 "throughput": "mse"
             }
         )
-        preprocessor = joblib.load('preprocessor.joblib')
-        delay_scaler = joblib.load('delay_scaler.joblib')
-        throughput_scaler = joblib.load('throughput_scaler.joblib')
+        preprocessor = joblib.load(os.path.join(models_dir, 'preprocessor.joblib'))
+        delay_scaler = joblib.load(os.path.join(models_dir, 'delay_scaler.joblib'))
+        throughput_scaler = joblib.load(os.path.join(models_dir, 'throughput_scaler.joblib'))
 
         sample_input = pd.DataFrame([input_data])
         if 'priority' in sample_input.columns:

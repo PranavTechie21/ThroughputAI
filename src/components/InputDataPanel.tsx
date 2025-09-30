@@ -60,12 +60,14 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
     { value: 'red', label: 'Red - Stop', color: 'bg-red-500' }
   ];
 
-  const [predictionResult, setPredictionResult] = useState<string | null>(null);
+  const [predictionResult, setPredictionResult] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setPredictionResult(null);
+    setError(null);
 
     try {
       const response = await fetch('http://localhost:5000/api/predict', {
@@ -76,21 +78,54 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
         body: JSON.stringify(formData),
       });
 
-      console.log('Response from server:', response);
-
       if (!response.ok) {
         throw new Error('Prediction request failed');
       }
 
       const result = await response.json();
       console.log('Parsed JSON from server:', result);
-      setPredictionResult(result.prediction);
-      onPredict(result);
-      navigate('/');
+      
+      // Parse the prediction string returned from Python script
+      let parsedPrediction;
+      try {
+        parsedPrediction = JSON.parse(result.prediction);
+      } catch (parseError) {
+        console.error('Failed to parse prediction JSON:', parseError);
+        throw new Error('Invalid prediction response format');
+      }
+
+      setPredictionResult(parsedPrediction);
+      
+      // Transform the data for the dashboard component
+      const transformedData = {
+        delay: {
+          minutes: parseFloat(parsedPrediction.predicted_delay.replace(' mins', '')),
+          confidence: 85, // Default confidence level
+          status: parseFloat(parsedPrediction.predicted_delay.replace(' mins', '')) < 5 ? 'green' : 
+                  parseFloat(parsedPrediction.predicted_delay.replace(' mins', '')) < 15 ? 'warning' : 'danger'
+        },
+        conflict: {
+          probability: parseFloat(parsedPrediction.predicted_conflict_probability) * 100,
+          risk: parseFloat(parsedPrediction.predicted_conflict_probability) < 0.3 ? 'low' : 
+                parseFloat(parsedPrediction.predicted_conflict_probability) < 0.7 ? 'medium' : 'high',
+          confidence: 90
+        },
+        throughput: {
+          target: 100,
+          current: parseFloat(parsedPrediction.predicted_throughput),
+          trend: '+2.3%'
+        },
+        aiRecommendations: parsedPrediction.ai_recommendations || [],
+        optimizedSchedule: parsedPrediction.optimized_schedule || null
+      };
+      
+      onPredict(transformedData);
+      navigate('/dashboard/home');
     } catch (error) {
       console.error(error);
-      alert('An error occurred during prediction. Check the console for details.');
-      setPredictionResult('An error occurred during prediction.');
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred during prediction';
+      setError(errorMessage);
+      setPredictionResult(null);
     } finally {
       setIsLoading(false);
     }
@@ -109,6 +144,7 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
       hour: new Date().getHours()
     });
     setPredictionResult(null);
+    setError(null);
   };
 
   const handleUploadClick = () => {
@@ -365,15 +401,57 @@ export function InputDataPanel({ onPredict }: InputDataPanelProps) {
           </div>
         </form>
         
+        {/* Error Display */}
+        {error && (
+          <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+            <h3 className="text-lg font-semibold mb-2 text-red-800 dark:text-red-200">
+              Error
+            </h3>
+            <div className="text-sm text-red-600 dark:text-red-300">
+              {error}
+            </div>
+          </div>
+        )}
+
         {/* Prediction Results Display */}
         {predictionResult && (
           <div className="mt-6 p-4 bg-slate-50 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
             <h3 className="text-lg font-semibold mb-2 text-slate-800 dark:text-white">
               Prediction Results
             </h3>
-            <div className="text-sm text-slate-600 dark:text-neutral-300">
-              <pre className="whitespace-pre-wrap">{predictionResult}</pre>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {predictionResult.predicted_delay}
+                </div>
+                <div className="text-sm text-slate-600 dark:text-neutral-300">Predicted Delay</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                  {(parseFloat(predictionResult.predicted_conflict_probability) * 100).toFixed(1)}%
+                </div>
+                <div className="text-sm text-slate-600 dark:text-neutral-300">Conflict Probability</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {parseFloat(predictionResult.predicted_throughput).toFixed(1)}
+                </div>
+                <div className="text-sm text-slate-600 dark:text-neutral-300">Predicted Throughput</div>
+              </div>
             </div>
+            
+            {predictionResult.ai_recommendations && predictionResult.ai_recommendations.length > 0 && (
+              <div className="mt-4">
+                <h4 className="font-semibold mb-2 text-slate-800 dark:text-white">AI Recommendations:</h4>
+                <ul className="space-y-1">
+                  {predictionResult.ai_recommendations.map((rec: string, index: number) => (
+                    <li key={index} className="text-sm text-slate-600 dark:text-neutral-300 bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                      {rec}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
         

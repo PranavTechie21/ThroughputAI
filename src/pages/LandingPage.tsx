@@ -98,7 +98,7 @@ export default function IndianRailwayLanding() {
                 </svg>
                 Login
               </span>
-            </button>
+              </button>
           </div>
 
           {/* Tricolor progress bars */}

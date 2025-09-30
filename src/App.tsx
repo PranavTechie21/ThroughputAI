@@ -18,6 +18,7 @@ import { AnalyticsPage } from './pages/Analytics';
 import { SystemStatusPage } from './pages/SystemStatus';
 import { DashboardHomePage } from './pages/DashboardHomePage';
 import LandingPage from './pages/LandingPage';
+import Prediction from './pages/Prediction';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { useTranslation } from './hooks/useTranslation';
 
@@ -182,6 +183,7 @@ function Dashboard({ onLogout, isDarkMode, toggleDarkMode, predictionResult, han
                     <div className="mt-4 flex items-center justify-between">
                         <nav className="flex flex-wrap items-center gap-2">
                             <Link to="/dashboard/home" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('home')}</Link>
+                            <Link to="/dashboard/prediction" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">Prediction</Link>
                             <Link to="/dashboard/configuration" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('configuration')}</Link>
                             <Link to="/dashboard/analytics" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('analytics')}</Link>
                             <Link to="/dashboard/status" className="px-3 py-1.5 rounded-full text-sm font-medium bg-white/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white hover:bg-blue-600 hover:text-white transition">{t('systemStatus')}</Link>
@@ -290,6 +292,7 @@ function AppContent() {
             <Route path="/dashboard" element={isLoggedIn ? <Dashboard onLogout={handleLogout} isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} predictionResult={predictionResult} handlePrediction={handlePrediction} controllerMessage={controllerMessage} /> : <Navigate to="/" />}>
                 <Route index element={<Navigate to="configuration" replace />} />
                 <Route path="home" element={<DashboardHomePage />} />
+                <Route path="prediction" element={<Prediction />} />
                 <Route path="configuration" element={<ConfigurationPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="status" element={<SystemStatusPage />} />
